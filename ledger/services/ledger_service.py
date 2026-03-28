@@ -17,9 +17,15 @@ class LedgerService:
             timestamp=time.time(),
         )
 
-        success = processor.process(tx)
+        if not processor.validate.validate(tx):
+            return {"status": "error", "reason": "Invalid transaction"}
 
-        return {"success": success}
+        success, reason = processor.process(tx)
+
+        if not success:
+            return {"status": "error", "reason": reason}
+
+        return {"status": "success", "tx_id": tx.tx_id}
 
     def get_balances(self):
         return processor.ledger.get_balances()
