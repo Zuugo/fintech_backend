@@ -3,9 +3,12 @@ from ledger_engine.execution.processor import TransactionProcessor
 from ledger_engine.queue.transaction_queue import TransactionQueue
 from ledger_engine.queue.worker import TransactionWorker
 from ledger_engine.replay.replay_engine import ReplayEngine
+from ledger_engine.status.transaction_status import TransactionStatusStore
 from ledger_engine.storage.snapshot_store import SnapshotStore
 from ledger_engine.storage.transaction_journal import TransactionJournal
 from ledger_engine.validation.validator import TransactionValidator
+
+from ledger.shared.state import status_store, tx_queue
 
 ledger = Ledger()
 
@@ -27,8 +30,6 @@ processor = TransactionProcessor(
 # restore state on server start
 
 processor.start()
-
-tx_queue = TransactionQueue()
 
 worker = TransactionWorker(tx_queue, processor)
 worker.start()
