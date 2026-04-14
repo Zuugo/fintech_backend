@@ -24,7 +24,7 @@ class LedgerService:
             timestamp=time.time(),
         )
 
-        tx_queue.enqueue({"tx": tx, "retries": 0})
+        tx_queue.enqueue({"tx": tx, "retries": 0, "next_attempt": time.time()})
 
         status_store.set_status(tx.tx_id, "PENDING")
 
