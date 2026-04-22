@@ -3,6 +3,7 @@ import time
 from ledger_engine.models.transaction import Transaction
 
 from ledger.engine import processor
+from ledger.models import TransactionStatus
 from ledger.shared.state import status_store, tx_queue
 
 
@@ -26,7 +27,9 @@ class LedgerService:
 
         tx_queue.enqueue({"tx": tx, "retries": 0, "next_attempt": time.time()})
 
-        status_store.set_status(tx.tx_id, "PENDING")
+        TransactionStatus.objects.update_or_create(
+            tx_id=tx.tx_id, defaults={"status": "PENDING", "reason": None}
+        )
 
         return {"status": "queued", "tx_id": tx.tx_id}
 

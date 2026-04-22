@@ -1,9 +1,11 @@
+from django.http.response import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import status
 
 from ledger.engine import status_store
 
+from .models import TransactionStatus
 from .services.ledger_service import LedgerService
 
 service = LedgerService()
@@ -26,5 +28,10 @@ def balances(request):
 
 @api_view(["GET"])
 def transaction_status(request, tx_id):
+    try:
+        tx = TransactionStatus.objects.get(tx_id=tx_id)
 
-    return Response(status_store.get_status(tx_id))
+        return JsonResponse({"status": tx.status, "reason": tx.reason})
+
+    except TransactionStatus.DoesNotExist:
+        return JsonResponse({"status": "UNKNOWN", "reason": None})

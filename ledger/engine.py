@@ -1,6 +1,6 @@
 from ledger_engine.core.ledger import Ledger
 from ledger_engine.execution.processor import TransactionProcessor
-from ledger_engine.queue.transaction_queue import TransactionQueue
+from ledger_engine.queue.transaction_queue import PersistentTransactionQueue
 from ledger_engine.queue.worker import TransactionWorker
 from ledger_engine.replay.replay_engine import ReplayEngine
 from ledger_engine.status.transaction_status import TransactionStatusStore
