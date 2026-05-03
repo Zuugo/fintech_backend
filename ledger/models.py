@@ -45,3 +45,4 @@ class TransactionQueue(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    processing_started_at = models.FloatField(null=True, blank=True)
