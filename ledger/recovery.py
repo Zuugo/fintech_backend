@@ -1,29 +1,19 @@
-from ledger_engine.models.transaction import Transaction
+from django.utils.timezone import now
+
+from .models import TransactionQueue
 
 
 def recover_pending_transactions():
-    from ledger.engine import tx_queue
+    recovered = TransactionQueue.objects.filter(status="PROCESSING")
 
-    from .models import TransactionStatus
+    count = 0
 
-    pending_txs = TransactionStatus.objects.filter(status="PENDING")
+    for job in recovered:
+        job.status = "RETRY"
+        job.next_attempt = now().timestamp()
+        job.processing_started_at = None
+        job.save()
 
-    for tx_record in pending_txs:
-        tx = Transaction(
-            tx_id=tx_record.tx_id,
-            sender=tx_record.sender,
-            receiver=tx_record.receiver,
-            amount=tx_record.amount,
-            nonce=tx_record.nonce,
-            timestamp=tx_record.timestamp,
-        )
+        count += 1
 
-        item = {
-            "tx": tx,
-            "retries": 0,
-            "next_attempt": 0,
-        }
-
-        tx_queue.enqueue(item)
-
-    print(f"[RECOVERY] Requeued {pending_txs.count()} transactions")
+    print(f"[RECOVERY] Recovered {count} stuck jobs")

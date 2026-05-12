@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import status
 
 from ledger.engine import status_store
+from ledger.services.status_service import StatusService
 
 from .models import TransactionStatus
 from .services.ledger_service import LedgerService
@@ -35,3 +36,9 @@ def transaction_status(request, tx_id):
 
     except TransactionStatus.DoesNotExist:
         return JsonResponse({"status": "UNKNOWN", "reason": None})
+
+
+@api_view(["GET"])
+def get_transaction_status(request, tx_id):
+    result = StatusService.get_status(tx_id)
+    return Response(result)

@@ -7,5 +7,5 @@ from .views import balances, submit_transaction
 urlpatterns = [
     path("submit/", submit_transaction),
     path("balances/", balances),
-    path("status/<str:tx_id>/", views.transaction_status),
+    path("status/<str:tx_id>/", views.get_transaction_status),
 ]

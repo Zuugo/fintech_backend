@@ -29,7 +29,5 @@ processor = TransactionProcessor(
 
 # restore state on server start
 
-processor.start()
 
 worker = TransactionWorker(tx_queue, processor)
-worker.start()

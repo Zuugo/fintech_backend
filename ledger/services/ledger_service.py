@@ -1,6 +1,7 @@
 import time
 
 from django.db import IntegrityError
+from django.utils.timezone import now
 from ledger_engine.models.transaction import Transaction
 
 from ledger.engine import processor
@@ -21,7 +22,7 @@ class LedgerService:
                 amount=data["amount"],
                 nonce=data["nonce"],
                 status="PENDING",
-                next_attempt=time.time(),
+                next_attempt=now(),
             )
 
         except IntegrityError:

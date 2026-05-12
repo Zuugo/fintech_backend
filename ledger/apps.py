@@ -1,7 +1,9 @@
+import sys
 import threading
 
 from django.apps import AppConfig
-from django.utils.autoreload import sys
+from django.db import connections
+from django.db.utils import OperationalError, ProgrammingError
 
 
 class LedgerConfig(AppConfig):
@@ -11,15 +13,27 @@ class LedgerConfig(AppConfig):
     def ready(self):
         import os
 
-        if os.environ.get("RUN MAIN") != "true":
+        if os.environ.get("RUN_MAIN") != "true":
             return
 
-        if "migrate" in sys.argv or "makemigrations" in sys.argv:
+        if any(cmd in sys.argv for cmd in ["migrate", "makemigrations"]):
             return
 
-        from ledger.engine import recover_pending_transactions, worker
+        try:
+            from ledger.models import TransactionQueue
 
-        recover_pending_transactions()
+            TransactionQueue.objects.exists()
+        except (OperationalError, ProgrammingError) as e:
+            print(f"[WORKER] DB/schema not ready: {e}")
+            return
 
-        t = threading.Thread(target=worker.run, daemon=True)
-        t.start()
+        def start_worker():
+
+            from ledger.engine import worker
+            from ledger.recovery import recover_pending_transactions
+
+            recover_pending_transactions()
+
+            worker.start()
+
+        threading.Timer(1.0, start_worker).start()
