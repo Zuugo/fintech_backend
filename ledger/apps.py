@@ -1,9 +1,8 @@
+import os
 import sys
 import threading
 
 from django.apps import AppConfig
-from django.db import connections
-from django.db.utils import OperationalError, ProgrammingError
 
 
 class LedgerConfig(AppConfig):
@@ -11,7 +10,6 @@ class LedgerConfig(AppConfig):
     name = "ledger"
 
     def ready(self):
-        import os
 
         if os.environ.get("RUN_MAIN") != "true":
             return
@@ -19,21 +17,20 @@ class LedgerConfig(AppConfig):
         if any(cmd in sys.argv for cmd in ["migrate", "makemigrations"]):
             return
 
-        try:
-            from ledger.models import TransactionQueue
-
-            TransactionQueue.objects.exists()
-        except (OperationalError, ProgrammingError) as e:
-            print(f"[WORKER] DB/schema not ready: {e}")
-            return
-
         def start_worker():
 
-            from ledger.engine import worker
-            from ledger.recovery import recover_pending_transactions
+            try:
 
-            recover_pending_transactions()
+                from ledger.engine import processor, worker
+                from ledger.recovery import recover_pending_transactions
 
-            worker.start()
+                processor.start()
+
+                recover_pending_transactions()
+
+                worker.start()
+
+            except Exception as e:
+                print(f"[STARTUP ERROR] {e}")
 
         threading.Timer(1.0, start_worker).start()

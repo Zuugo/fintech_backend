@@ -12,6 +12,7 @@ class TransactionStatus(models.Model):
             ("RETRY", "Retry"),
             ("SUCCESS", "Success"),
             ("FAILED", "Failed"),
+            ("BUFFERED", "Buffered"),
         ],
     )
     reason = models.TextField(null=True, blank=True)
@@ -30,6 +31,7 @@ class TransactionQueue(models.Model):
         ("RETRY", "Retry"),
         ("FAILED", "Failed"),
         ("SUCCESS", "Success"),
+        ("BUFFERED", "Buffered"),
     ]
 
     tx_id = models.CharField(max_length=100, unique=True)
