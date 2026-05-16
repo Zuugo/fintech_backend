@@ -51,3 +51,16 @@ class TransactionQueue(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     processing_started_at = models.DateTimeField(null=True, blank=True)
+
+
+class TransactionEvent(models.Model):
+    tx_id = models.CharField(max_length=255)
+
+    event = models.CharField(max_length=55)
+
+    details = models.JSONField(default=dict)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.tx_id} -> {self.event}"

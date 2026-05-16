@@ -1,7 +1,26 @@
-from ledger.models import TransactionStatus
+from ledger.models import TransactionEvent, TransactionStatus
 
 
 class StatusService:
+
+    def update_transaction_status(tx_id: str, status: str, reason=None):
+        tx_status, _ = TransactionStatus.objects.update_or_create(
+            tx_id=tx_id,
+            defaults={
+                "status": status,
+                "reason": reason,
+            },
+        )
+
+        TransactionEvent.objects.create(
+            tx_id=tx_id,
+            event=status,
+            details={
+                "reason": reason,
+            },
+        )
+
+        return tx_status
 
     @staticmethod
     def get_status(tx_id):
