@@ -6,7 +6,7 @@ from rest_framework.views import status
 from ledger.engine import status_store
 from ledger.services.status_service import StatusService
 
-from .models import ReplayEvent, TransactionStatus
+from .models import LedgerEvent, ReplayEvent, TransactionStatus
 from .services.ledger_service import LedgerService
 
 service = LedgerService()
@@ -54,6 +54,24 @@ def replay_events(request):
 
     data = [
         {
+            "event": e.event,
+            "details": e.details,
+            "created_at": e.created_at,
+        }
+        for e in events
+    ]
+
+    return Response(data)
+
+
+@api_view(["GET"])
+def ledger_events(request):
+
+    events = LedgerEvent.objects.all().order_by("created_at")
+
+    data = [
+        {
+            "tx_id": e.tx_id,
             "event": e.event,
             "details": e.details,
             "created_at": e.created_at,

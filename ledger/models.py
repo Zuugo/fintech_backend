@@ -76,3 +76,15 @@ class ReplayEvent(models.Model):
 
     def __str__(self):
         return f"{self.event}"
+
+
+class LedgerEvent(models.Model):
+    tx_id = models.CharField(max_length=255, null=True)
+
+    event = models.CharField(max_length=55)
+    details = models.JSONField(default=dict)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.tx_id} -> {self.event}"
