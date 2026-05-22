@@ -2,6 +2,9 @@ import os
 import sys
 import threading
 
+worker_started = False
+lock = threading.Lock()
+
 from django.apps import AppConfig
 
 
@@ -11,8 +14,13 @@ class LedgerConfig(AppConfig):
 
     def ready(self):
 
-        if os.environ.get("RUN_MAIN") != "true":
-            return
+        global worker_started
+
+        with lock:
+            if worker_started:
+                return
+
+            worker_started = True
 
         if any(cmd in sys.argv for cmd in ["migrate", "makemigrations"]):
             return
