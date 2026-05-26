@@ -30,9 +30,12 @@ class LedgerConfig(AppConfig):
             try:
 
                 from ledger.engine import processor, worker
+                from ledger.reconciliation import reconcile_ledger_state
                 from ledger.recovery import recover_pending_transactions
 
                 processor.start()
+
+                reconcile_ledger_state(processor.ledger.processed_ids)
 
                 recover_pending_transactions()
 
