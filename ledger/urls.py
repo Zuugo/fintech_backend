@@ -8,4 +8,6 @@ urlpatterns = [
     path("status/<str:tx_id>/", views.get_transaction_status),
     path("replay_events/", views.replay_events),
     path("timeline/", views.ledger_events),
+    path("events/recover/", views.recover_events),
+    path("projected-balances/", views.projected_balances),
 ]

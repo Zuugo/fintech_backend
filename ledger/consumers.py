@@ -26,6 +26,7 @@ class LedgerConsumer(AsyncWebsocketConsumer):
         await self.send(
             text_data=json.dumps(
                 {
+                    "sequence": event["sequence"],
                     "tx_id": event["tx_id"],
                     "event": event["event"],
                     "details": event["details"],

@@ -79,6 +79,8 @@ class ReplayEvent(models.Model):
 
 
 class LedgerEvent(models.Model):
+    sequence = models.BigAutoField(unique=True, primary_key=True)
+
     tx_id = models.CharField(max_length=255, null=True)
 
     event = models.CharField(max_length=55)
@@ -88,3 +90,15 @@ class LedgerEvent(models.Model):
 
     def __str__(self):
         return f"{self.tx_id} -> {self.event}"
+
+
+class AccountProjection(models.Model):
+
+    account = models.CharField(max_length=255, unique=True)
+
+    balance = models.FloatField(default=0)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.account}: {self.balance}"

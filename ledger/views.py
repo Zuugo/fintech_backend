@@ -6,7 +6,7 @@ from rest_framework.views import status
 from ledger.engine import status_store
 from ledger.services.status_service import StatusService
 
-from .models import LedgerEvent, ReplayEvent, TransactionStatus
+from .models import AccountProjection, LedgerEvent, ReplayEvent, TransactionStatus
 from .services.ledger_service import LedgerService
 
 service = LedgerService()
@@ -78,5 +78,36 @@ def ledger_events(request):
         }
         for e in events
     ]
+
+    return Response(data)
+
+
+@api_view(["GET"])
+def recover_events(request):
+
+    after = request.GET.get("after", 0)
+
+    events = LedgerEvent.objects.filter(sequence__gt=after).order_by("sequence")
+
+    data = [
+        {
+            "sequence": e.sequence,
+            "tx_id": e.tx_id,
+            "event": e.event,
+            "details": e.details,
+            "created_at": e.created_at,
+        }
+        for e in events
+    ]
+
+    return Response(data)
+
+
+@api_view(["GET"])
+def projected_balances(request):
+
+    projections = AccountProjection.objects.all()
+
+    data = [{p.account: p.balance} for p in projections]
 
     return Response(data)
