@@ -32,10 +32,30 @@ class LedgerConfig(AppConfig):
                 from ledger.engine import processor, worker
                 from ledger.reconciliation import reconcile_ledger_state
                 from ledger.recovery import recover_pending_transactions
+                from ledger.services.event_service import EventService
+                from ledger.services.projection_verifier import ProjectionVerifier
 
                 processor.start()
 
                 reconcile_ledger_state(processor.ledger.processed_ids)
+
+                verified = ProjectionVerifier.verify(processor.ledger)
+
+                if verified:
+
+                    EventService.emit(
+                        None,
+                        "PROJECTION_VERIFIED",
+                        {},
+                    )
+
+                else:
+
+                    EventService.emit(
+                        None,
+                        "PROJECTION_MISMATCH",
+                        {},
+                    )
 
                 recover_pending_transactions()
 
