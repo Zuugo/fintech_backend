@@ -4,7 +4,9 @@ from rest_framework.response import Response
 from rest_framework.views import status
 
 from ledger.engine import status_store
+from ledger.serializers import LedgerEventSerializer
 from ledger.services.status_service import StatusService
+from ledger.services.timeline_service import TimelineService
 
 from .models import AccountProjection, LedgerEvent, ReplayEvent, TransactionStatus
 from .services.ledger_service import LedgerService
@@ -111,3 +113,13 @@ def projected_balances(request):
     data = [{p.account: p.balance} for p in projections]
 
     return Response(data)
+
+
+@api_view(["GET"])
+def transaction_timeline(request, tx_id):
+
+    events = TimelineService.get_transaction_timeline(tx_id)
+
+    serializer = LedgerEventSerializer(events, many=True)
+
+    return Response(serializer.data)

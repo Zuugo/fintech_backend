@@ -10,7 +10,7 @@ def recover_pending_transactions():
 
     for job in recovered:
         job.status = "RETRY"
-        job.next_attempt = now().timestamp()
+        job.next_attempt = now()
         job.processing_started_at = None
         job.save()
 
