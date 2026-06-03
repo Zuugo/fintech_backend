@@ -4,11 +4,17 @@ from rest_framework.response import Response
 from rest_framework.views import status
 
 from ledger.engine import status_store
-from ledger.serializers import LedgerEventSerializer
+from ledger.serializers import DeadLetterQueueSerializer, LedgerEventSerializer
 from ledger.services.status_service import StatusService
 from ledger.services.timeline_service import TimelineService
 
-from .models import AccountProjection, LedgerEvent, ReplayEvent, TransactionStatus
+from .models import (
+    AccountProjection,
+    DeadLetterQueue,
+    LedgerEvent,
+    ReplayEvent,
+    TransactionStatus,
+)
 from .services.ledger_service import LedgerService
 
 service = LedgerService()
@@ -121,5 +127,15 @@ def transaction_timeline(request, tx_id):
     events = TimelineService.get_transaction_timeline(tx_id)
 
     serializer = LedgerEventSerializer(events, many=True)
+
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def dead_letter_queue(request):
+
+    records = DeadLetterQueue.objects.order_by("-created_at")
+
+    serializer = DeadLetterQueueSerializer(records, many=True)
 
     return Response(serializer.data)

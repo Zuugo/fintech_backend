@@ -11,4 +11,5 @@ urlpatterns = [
     path("events/recover/", views.recover_events),
     path("projected-balances/", views.projected_balances),
     path("transactions/<str:tx_id>/timeline/", views.transaction_timeline),
+    path("dead-letter/", views.dead_letter_queue),
 ]

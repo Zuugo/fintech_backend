@@ -102,3 +102,23 @@ class AccountProjection(models.Model):
 
     def __str__(self):
         return f"{self.account}: {self.balance}"
+
+
+class DeadLetterQueue(models.Model):
+
+    tx_id = models.CharField(max_length=100, unique=True)
+
+    sender = models.CharField(max_length=100)
+    receiver = models.CharField(max_length=100)
+
+    amount = models.FloatField()
+    nonce = models.IntegerField()
+
+    reason = models.TextField()
+
+    retries = models.IntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.tx_id
