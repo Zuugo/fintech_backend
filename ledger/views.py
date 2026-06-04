@@ -6,6 +6,7 @@ from rest_framework.views import APIView, status
 from ledger.engine import status_store
 from ledger.serializers import DeadLetterQueueSerializer, LedgerEventSerializer
 from ledger.services.account_history_service import AccountHistoryService
+from ledger.services.account_statement_service import AccountStatementService
 from ledger.services.event_service import EventService
 from ledger.services.status_service import StatusService
 from ledger.services.timeline_service import TimelineService
@@ -171,3 +172,12 @@ class AccountHistoryAPIView(APIView):
         history = AccountHistoryService.get_history(account)
 
         return Response(history)
+
+
+class AccountStatementAPIView(APIView):
+
+    def get(self, request, account):
+
+        statement = AccountStatementService.generate_statement(account)
+
+        return Response(statement)
