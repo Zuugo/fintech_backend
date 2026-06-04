@@ -1,10 +1,12 @@
 from django.http.response import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.views import status
+from rest_framework.views import APIView, status
 
 from ledger.engine import status_store
 from ledger.serializers import DeadLetterQueueSerializer, LedgerEventSerializer
+from ledger.services.account_history_service import AccountHistoryService
+from ledger.services.event_service import EventService
 from ledger.services.status_service import StatusService
 from ledger.services.timeline_service import TimelineService
 
@@ -13,6 +15,7 @@ from .models import (
     DeadLetterQueue,
     LedgerEvent,
     ReplayEvent,
+    TransactionQueue,
     TransactionStatus,
 )
 from .services.ledger_service import LedgerService
@@ -28,6 +31,26 @@ def submit_transaction(request):
         return Response(result, status=status.HTTP_400_BAD_REQUEST)
 
     return Response(result, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+def replay_dead_letter(request, tx_id):
+
+    dead_letter_tx = DeadLetterQueue.objects.get(tx_id=tx_id)
+
+    job = TransactionQueue.objects.get(tx_id=tx_id)
+
+    job.status = "PENDING"
+    job.retries = 0
+    job.reason = None
+    job.processing_started_at = None
+    job.save()
+
+    dead_letter_tx.delete()
+
+    EventService.emit(tx_id, "DLQ_REPLAYED", {})
+
+    return Response({"status": "requeued", "tx_id": tx_id})
 
 
 @api_view(["GET"])
@@ -139,3 +162,12 @@ def dead_letter_queue(request):
     serializer = DeadLetterQueueSerializer(records, many=True)
 
     return Response(serializer.data)
+
+
+class AccountHistoryAPIView(APIView):
+
+    def get(self, request, account):
+
+        history = AccountHistoryService.get_history(account)
+
+        return Response(history)

@@ -12,4 +12,6 @@ urlpatterns = [
     path("projected-balances/", views.projected_balances),
     path("transactions/<str:tx_id>/timeline/", views.transaction_timeline),
     path("dead-letter/", views.dead_letter_queue),
+    path("dead-letter/<str:tx_id>/replay/", views.replay_dead_letter),
+    path("accounts/<str:account>/history/", views.AccountHistoryAPIView.as_view()),
 ]
