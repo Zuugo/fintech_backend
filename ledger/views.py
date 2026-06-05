@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.http.response import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -8,6 +9,7 @@ from ledger.serializers import DeadLetterQueueSerializer, LedgerEventSerializer
 from ledger.services.account_history_service import AccountHistoryService
 from ledger.services.account_statement_service import AccountStatementService
 from ledger.services.event_service import EventService
+from ledger.services.statement_export_service import StatementExportService
 from ledger.services.status_service import StatusService
 from ledger.services.timeline_service import TimelineService
 
@@ -181,3 +183,21 @@ class AccountStatementAPIView(APIView):
         statement = AccountStatementService.generate_statement(account)
 
         return Response(statement)
+
+
+class AccountStatementCSVView(APIView):
+
+    def get(self, request, account):
+
+        csv_data = StatementExportService.export_csv(account)
+
+        response = HttpResponse(
+            csv_data,
+            content_type="text/csv",
+        )
+
+        response["Content-Disposition"] = (
+            f"attachment; " f'filename="{account}_statement.csv"'
+        )
+
+        return response

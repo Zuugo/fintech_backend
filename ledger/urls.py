@@ -15,4 +15,7 @@ urlpatterns = [
     path("dead-letter/<str:tx_id>/replay/", views.replay_dead_letter),
     path("accounts/<str:account>/history/", views.AccountHistoryAPIView.as_view()),
     path("accounts/<str:account>/statement/", views.AccountStatementAPIView.as_view()),
+    path(
+        "accounts/<str:account>/statement/csv/", views.AccountStatementCSVView.as_view()
+    ),
 ]
