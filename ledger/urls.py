@@ -18,4 +18,7 @@ urlpatterns = [
     path(
         "accounts/<str:account>/statement/csv/", views.AccountStatementCSVView.as_view()
     ),
+    path(
+        "accounts/<str:account>/statement/pdf/", views.AccountStatementPDFView.as_view()
+    ),
 ]

@@ -9,6 +9,7 @@ from ledger.serializers import DeadLetterQueueSerializer, LedgerEventSerializer
 from ledger.services.account_history_service import AccountHistoryService
 from ledger.services.account_statement_service import AccountStatementService
 from ledger.services.event_service import EventService
+from ledger.services.pdf_statement_service import PDFStatementService
 from ledger.services.statement_export_service import StatementExportService
 from ledger.services.status_service import StatusService
 from ledger.services.timeline_service import TimelineService
@@ -198,6 +199,21 @@ class AccountStatementCSVView(APIView):
 
         response["Content-Disposition"] = (
             f"attachment; " f'filename="{account}_statement.csv"'
+        )
+
+        return response
+
+
+class AccountStatementPDFView(APIView):
+
+    def get(self, request, account):
+
+        pdf = PDFStatementService.generate_pdf(account)
+
+        response = HttpResponse(pdf, content_type="application/pdf")
+
+        response["Content-Disposition"] = (
+            f"attachment; " f"filename='{account}statement.pdf'"
         )
 
         return response
