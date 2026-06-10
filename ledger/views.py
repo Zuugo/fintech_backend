@@ -235,7 +235,7 @@ class SnapshotRestoreView(APIView):
 
         return Response(
             {
-                "status": "loaded",
-                "snapshot": snapshot,
+                "status": "restored",
+                "snapshot": index,
             }
         )

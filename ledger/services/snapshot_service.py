@@ -36,19 +36,17 @@ class SnapshotService:
         with open(file_path) as f:
             snapshot = json.load(f)
 
-            processor.ledger.balances = snapshot["balances"]
-            processor.ledger.nonces = snapshot["nonces"]
-            processor.ledger.processed_ids = set(snapshot["processed_ids"])
-            processor.ledger.future_transactions = snapshot.get(
-                "future_transactions", {}
-            )
+        processor.ledger.balances = snapshot["balances"]
+        processor.ledger.nonces = snapshot["nonces"]
+        processor.ledger.processed_ids = set(snapshot["processed_ids"])
+        processor.ledger.future_transactions = snapshot.get("future_transactions", {})
 
-            EventService.emit(
-                None,
-                "SNAPSHOT_RESTORED",
-                {
-                    "snapshot_index": index,
-                },
-            )
+        EventService.emit(
+            None,
+            "SNAPSHOT_RESTORED",
+            {
+                "snapshot_index": index,
+            },
+        )
 
         return snapshot
