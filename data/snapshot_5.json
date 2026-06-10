@@ -1,0 +1,31 @@
+{
+  "tx_index": 5,
+  "balances": {
+    "Alice": 70.0,
+    "Joe": 15.0,
+    "Kurt": 20.0,
+    "Bill": 105.0,
+    "Tim": 40.0
+  },
+  "nonces": {
+    "SYSTEM": 2,
+    "Alice": 2,
+    "Joe": 3,
+    "Bill": 1,
+    "Tim": 1,
+    "Kurt": 1
+  },
+  "processed_ids": [
+    "TEST_CRASH",
+    "2",
+    "5",
+    "9",
+    "TEST_DLQ3",
+    "7",
+    "8",
+    "12",
+    "3",
+    "1"
+  ],
+  "future_transactions": {}
+}

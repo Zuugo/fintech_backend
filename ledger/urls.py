@@ -21,4 +21,6 @@ urlpatterns = [
     path(
         "accounts/<str:account>/statement/pdf/", views.AccountStatementPDFView.as_view()
     ),
+    path("snapshots/", views.SnapshotListView.as_view()),
+    path("snapshots/<int:index>/restore/", views.SnapshotRestoreView.as_view()),
 ]

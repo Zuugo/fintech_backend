@@ -10,6 +10,7 @@ from ledger.services.account_history_service import AccountHistoryService
 from ledger.services.account_statement_service import AccountStatementService
 from ledger.services.event_service import EventService
 from ledger.services.pdf_statement_service import PDFStatementService
+from ledger.services.snapshot_service import SnapshotService
 from ledger.services.statement_export_service import StatementExportService
 from ledger.services.status_service import StatusService
 from ledger.services.timeline_service import TimelineService
@@ -217,3 +218,24 @@ class AccountStatementPDFView(APIView):
         )
 
         return response
+
+
+class SnapshotListView(APIView):
+
+    def get(self, request):
+
+        return Response(SnapshotService.list_snapshots())
+
+
+class SnapshotRestoreView(APIView):
+
+    def post(self, request, index):
+
+        snapshot = SnapshotService.restore_snapshot(index)
+
+        return Response(
+            {
+                "status": "loaded",
+                "snapshot": snapshot,
+            }
+        )
