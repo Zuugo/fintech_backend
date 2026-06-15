@@ -3,6 +3,7 @@ from pathlib import Path
 
 from ledger.engine import processor
 from ledger.services.event_service import EventService
+from ledger.services.snapshot_replay_service import SnapshotReplayService
 
 
 class SnapshotService:
@@ -40,6 +41,8 @@ class SnapshotService:
         processor.ledger.nonces = snapshot["nonces"]
         processor.ledger.processed_ids = set(snapshot["processed_ids"])
         processor.ledger.future_transactions = snapshot.get("future_transactions", {})
+
+        SnapshotReplayService.replay_after_snapshot(snapshot)
 
         EventService.emit(
             None,
