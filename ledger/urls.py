@@ -23,4 +23,7 @@ urlpatterns = [
     ),
     path("snapshots/", views.SnapshotListView.as_view()),
     path("snapshots/<int:index>/restore/", views.SnapshotRestoreView.as_view()),
+    path("audit/summary/", views.AuditSummaryView.as_view()),
+    path("audit/events/", views.AuditEventsView.as_view()),
+    path("audit/integrity/", views.AudityIntegrityView.as_view()),
 ]
