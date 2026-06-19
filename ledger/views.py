@@ -10,6 +10,7 @@ from ledger.services.account_history_service import AccountHistoryService
 from ledger.services.account_statement_service import AccountStatementService
 from ledger.services.audit_service import AuditService
 from ledger.services.event_service import EventService
+from ledger.services.journal_integrity_service import JournalIntegrityService
 from ledger.services.pdf_statement_service import PDFStatementService
 from ledger.services.snapshot_service import SnapshotService
 from ledger.services.statement_export_service import StatementExportService
@@ -261,3 +262,12 @@ class AudityIntegrityView(APIView):
     def get(self, request):
 
         return Response(AuditService.integrity())
+
+
+class AuditJournalIntegrityView(APIView):
+
+    def get(self, request):
+
+        result = JournalIntegrityService.verify()
+
+        return Response(result)

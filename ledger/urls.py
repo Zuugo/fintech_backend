@@ -26,4 +26,5 @@ urlpatterns = [
     path("audit/summary/", views.AuditSummaryView.as_view()),
     path("audit/events/", views.AuditEventsView.as_view()),
     path("audit/integrity/", views.AudityIntegrityView.as_view()),
+    path("audit/journal/", views.AuditJournalIntegrityView.as_view()),
 ]
