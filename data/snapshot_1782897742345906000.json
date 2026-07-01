@@ -1,0 +1,24 @@
+{
+  "balances": {
+    "Alice": 65.0,
+    "Bob": 20.0,
+    "Joe": 50.0,
+    "Kurt": 75.0,
+    "Reed": 15.0
+  },
+  "future_transactions": {},
+  "journal_position": 5,
+  "last_hash": "3aa173c8bd7916a925ff6ef0c412b40317d8582bb282c4b182be1b10493b92b3",
+  "nonces": {
+    "Alice": 2,
+    "SYSTEM": 3
+  },
+  "processed_ids": [
+    "4",
+    "3",
+    "5",
+    "1",
+    "2"
+  ],
+  "snapshot_id": 1782897742345906000
+}

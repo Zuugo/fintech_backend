@@ -7,7 +7,7 @@ class SnapshotReplayService:
     @staticmethod
     def replay_after_snapshot(snapshot):
 
-        start_index = snapshot["tx_index"]
+        start_index = snapshot["snapshot_id"]
 
         transactions = journal.load_from(start_index)
 
