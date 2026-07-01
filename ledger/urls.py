@@ -27,4 +27,5 @@ urlpatterns = [
     path("audit/events/", views.AuditEventsView.as_view()),
     path("audit/integrity/", views.AudityIntegrityView.as_view()),
     path("audit/journal/", views.AuditJournalIntegrityView.as_view()),
+    path("audit/<int:index>/snapshot/", views.AuditSnapshotIntegrityView.as_view()),
 ]
