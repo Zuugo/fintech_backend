@@ -1,3 +1,4 @@
+from ledger.services.audit_service import AuditService
 from ledger.services.event_service import EventService
 from ledger.services.journal_integrity_service import JournalIntegrityService
 from ledger.services.replay_service import ReplayService
@@ -21,6 +22,8 @@ class StartupService:
         self._replay_journal(context)
 
         self._verify_journal(context)
+
+        self._verify_ledger(context)
 
         self._complete_startup(context)
 
@@ -142,3 +145,16 @@ class StartupService:
         ReplayService.log("JOURNAL_VERIFIED", result)
 
         EventService.emit(None, "JOURNAL_VERIFIED", result)
+
+    def _verify_ledger(self, context):
+
+        result = AuditService.integrity()
+
+        if not result["ledger_matches_projection"]:
+            raise RuntimeError(f"Ledger state does not match projection")
+
+        context.ledger_verified = True
+
+        ReplayService.log("LEDGER_VERIFIED", result)
+
+        EventService.emit(None, "LEDGER_VERIFIED", result)
