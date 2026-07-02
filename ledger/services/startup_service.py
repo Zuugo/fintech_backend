@@ -1,4 +1,5 @@
 from ledger.services.event_service import EventService
+from ledger.services.journal_integrity_service import JournalIntegrityService
 from ledger.services.replay_service import ReplayService
 from ledger.services.snapshot_integrity_service import SnapshotIntegrityService
 from ledger.services.startup_context import StartupContext
@@ -18,6 +19,8 @@ class StartupService:
         self._verify_snapshot(context)
 
         self._replay_journal(context)
+
+        self._verify_journal(context)
 
         self._complete_startup(context)
 
@@ -126,3 +129,16 @@ class StartupService:
             "SNAPSHOT_VERIFIED",
             result,
         )
+
+    def _verify_journal(self, context):
+
+        result = JournalIntegrityService.verify()
+
+        if not result["healthy"]:
+            raise RuntimeError(result["reason"])
+
+        context.journal_verified = True
+
+        ReplayService.log("JOURNAL_VERIFIED", result)
+
+        EventService.emit(None, "JOURNAL_VERIFIED", result)
