@@ -1,5 +1,6 @@
 from ledger.services.event_service import EventService
 from ledger.services.replay_service import ReplayService
+from ledger.services.startup_context import StartupContext
 
 
 class StartupService:
@@ -9,20 +10,24 @@ class StartupService:
 
     def start(self):
 
-        journal_position = self._restore_snapshot()
+        context = StartupContext()
 
-        self._replay_journal(journal_position)
+        self._restore_snapshot(context)
 
-        self._complete_startup()
+        self._replay_journal(context)
 
-    def _restore_snapshot(self):
+        self._complete_startup(context)
 
-        journal_position = self.processor.replay_engine.restore_from_snapshot()
+    def _restore_snapshot(self, context):
+
+        context.journal_position = self.processor.replay_engine.restore_from_snapshot()
+
+        context.snapshot_loaded = context.journal_position > 0
 
         ReplayService.log(
             "SNAPSHOT_RESTORED",
             {
-                "journal_position": journal_position,
+                "journal_position": context.journal_position,
             },
         )
 
@@ -30,15 +35,13 @@ class StartupService:
             None,
             "SNAPSHOT_RESTORED",
             {
-                "journal_position": journal_position,
+                "journal_position": context.journal_position,
             },
         )
 
-        return journal_position
+    def _replay_journal(self, context):
 
-    def _replay_journal(self, journal_position):
-
-        transactions = self.processor.journal.load_from(journal_position)
+        transactions = self.processor.journal.load_from(context.journal_position)
 
         ReplayService.log("JOURNAL_REPLAY_STARTED", {"count": len(transactions)})
 
@@ -68,15 +71,20 @@ class StartupService:
 
             self.processor.ledger.apply_transaction(tx)
 
+        context.replayed_transactions = len(transactions)
+
         return transactions
 
-    def _complete_startup(self):
+    def _complete_startup(self, context):
+
+        context.balances = dict(self.processor.ledger.balances)
+        context.nonces = dict(self.processor.ledger.nonces)
 
         ReplayService.log(
             "REPLAY_COMPLETED",
             {
-                "balances": self.processor.ledger.balances,
-                "nonces": self.processor.ledger.nonces,
+                "balances": context.balances,
+                "nonces": context.nonces,
             },
         )
 
@@ -84,7 +92,7 @@ class StartupService:
             None,
             "REPLAY_COMPLETED",
             {
-                "balances": self.processor.ledger.balances,
-                "nonces": self.processor.ledger.nonces,
+                "balances": context.balances,
+                "nonces": context.nonces,
             },
         )
