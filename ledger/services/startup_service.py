@@ -1,5 +1,6 @@
 from ledger.services.event_service import EventService
 from ledger.services.replay_service import ReplayService
+from ledger.services.snapshot_integrity_service import SnapshotIntegrityService
 from ledger.services.startup_context import StartupContext
 
 
@@ -14,15 +15,21 @@ class StartupService:
 
         self._restore_snapshot(context)
 
+        self._verify_snapshot(context)
+
         self._replay_journal(context)
 
         self._complete_startup(context)
 
     def _restore_snapshot(self, context):
 
-        context.journal_position = self.processor.replay_engine.restore_from_snapshot()
+        snapshot = self.processor.replay_engine.restore_from_snapshot()
 
-        context.snapshot_loaded = context.journal_position > 0
+        if snapshot:
+            context.snapshot_loaded = True
+            context.snapshot_id = snapshot["snapshot_id"]
+            context.journal_position = snapshot["journal_position"]
+            context.last_hash = snapshot["last_hash"]
 
         ReplayService.log(
             "SNAPSHOT_RESTORED",
@@ -95,4 +102,27 @@ class StartupService:
                 "balances": context.balances,
                 "nonces": context.nonces,
             },
+        )
+
+    def _verify_snapshot(self, context):
+
+        if not context.snapshot_loaded:
+            return
+
+        result = SnapshotIntegrityService.verify(context.snapshot_id)
+
+        if not result["healthy"]:
+            raise RuntimeError(result["reason"])
+
+        context.snapshot_verified = True
+
+        ReplayService.log(
+            "SNAPSHOT_VERIFIED",
+            result,
+        )
+
+        EventService.emit(
+            None,
+            "SNAPSHOT_VERIFIED",
+            result,
         )
