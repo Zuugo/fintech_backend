@@ -15,15 +15,27 @@ class StartupService:
 
         context = StartupContext()
 
+        self._restore(context)
+
+        self._verify(context)
+
+        self._runtime(context)
+
+    def _restore(self, context):
+
         self._restore_snapshot(context)
 
-        self._verify_snapshot(context)
-
         self._replay_journal(context)
+
+    def _verify(self, context):
+
+        self._verify_snapshot(context)
 
         self._verify_journal(context)
 
         self._verify_ledger(context)
+
+    def _runtime(self, context):
 
         self._complete_startup(context)
 
